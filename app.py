@@ -1,48 +1,48 @@
-"""CareFlow demo web app.
+"""CareFlow: Clinical Pathway Process Mining — Streamlit Cloud entrypoint.
 
-Run locally:
-    python -m pip install -r requirements.txt
-    python app.py
-Then open http://127.0.0.1:5000
-
-All records shown by this demo are fictional. Do not use real patient data.
+All dashboard records are synthetic demo data. Never use real patient information.
+Deploy with: streamlit run app.py
 """
-from flask import Flask, jsonify, send_from_directory
 from pathlib import Path
+import streamlit as st
+import streamlit.components.v1 as components
 
 BASE_DIR = Path(__file__).resolve().parent
-app = Flask(__name__, static_folder=None)
+HTML_FILE = BASE_DIR / "index.html"
 
-DEPARTMENTS = [
-    {"name": "Emergency", "lead": "Dr. Maya Chen", "active_cases": 42, "capacity_pct": 91, "status": "At risk"},
-    {"name": "Cardiology", "lead": "Dr. Arjun Patel", "active_cases": 31, "capacity_pct": 78, "status": "On track"},
-    {"name": "Neurology", "lead": "Dr. Leena Rao", "active_cases": 24, "capacity_pct": 83, "status": "Monitor"},
-    {"name": "General Medicine", "lead": "Dr. Omar Khan", "active_cases": 56, "capacity_pct": 74, "status": "On track"},
-    {"name": "Orthopedics", "lead": "Dr. Sofia Martin", "active_cases": 28, "capacity_pct": 88, "status": "Monitor"},
-    {"name": "Oncology", "lead": "Dr. Ethan Cole", "active_cases": 19, "capacity_pct": 68, "status": "On track"},
-    {"name": "ICU", "lead": "Dr. Noah Williams", "active_cases": 15, "capacity_pct": 94, "status": "Monitor"},
-]
+st.set_page_config(
+    page_title="CareFlow | Clinical Pathway Process Mining",
+    page_icon="💠",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 
-@app.get("/")
-def home():
-    return send_from_directory(BASE_DIR, "index.html")
+# Keep Streamlit's outer frame clean so the existing interactive dashboard
+# can render inside an iframe. The dashboard's own JavaScript handles tabs,
+# task forms, filters, and CSV exports.
+st.markdown(
+    """
+    <style>
+      .block-container {padding-top: .6rem; padding-bottom: .5rem; max-width: 100%;}
+      header[data-testid="stHeader"] {height: 0rem;}
+      footer {visibility: hidden;}
+      div[data-testid="stToolbar"] {visibility: hidden; height: 0%; position: fixed;}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-@app.get("/api/health")
-def health():
-    return jsonify({"status": "ok", "app": "CareFlow demo", "demo_data": True})
+if not HTML_FILE.exists():
+    st.error("CareFlow dashboard file is missing. Ensure index.html is in the repository root beside app.py.")
+    st.stop()
 
-@app.get("/api/departments")
-def departments():
-    return jsonify(DEPARTMENTS)
+html = HTML_FILE.read_text(encoding="utf-8")
+components.html(html, height=1800, scrolling=True)
 
-@app.get("/robots.txt")
-def robots():
-    return send_from_directory(BASE_DIR, "robots.txt")
-
-@app.get("/sitemap.xml")
-def sitemap():
-    return send_from_directory(BASE_DIR, "sitemap.xml")
-
-if __name__ == "__main__":
-    # Local development server only; use a production WSGI server for deployment.
-    app.run(host="127.0.0.1", port=5000, debug=True)
+with st.expander("About this demo and troubleshooting"):
+    st.write(
+        "CareFlow is a demonstration dashboard populated with fictional department, "
+        "care-team, task, pathway, and patient-flow records. It is not a clinical system "
+        "and must not be used for clinical decisions."
+    )
+    st.caption("If the dashboard does not update after a code change, use Streamlit's menu and select Rerun, or reboot the app from Manage app.")

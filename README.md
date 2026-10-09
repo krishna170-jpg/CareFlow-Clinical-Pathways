@@ -1,31 +1,24 @@
-# CareFlow — Clinical Pathway Process Mining Demo
+# CareFlow — Clinical Pathway Process Mining
 
-A fictional hospital-operations dashboard demo with sections for Departments, Task Board, Reports, Patient Flow, Clinical Pathways, Care Teams, and Governance.
+CareFlow is a fictional, interactive dashboard demo for department performance, task coordination, reports, patient flow, clinical pathways, care teams, and governance.
 
-## Run locally with Python
+## Deploy on Streamlit Community Cloud
 
-1. Install Python 3.10 or newer.
-2. Open a terminal in this folder.
-3. Install dependencies:
+1. Put `app.py`, `index.html`, and `requirements.txt` together in the **root** of your GitHub repository.
+2. Open https://share.streamlit.io/ and sign in with GitHub.
+3. Choose **Create app** → **Yup, I have an app**.
+4. Select your repository, branch `main`, and main file path `app.py`.
+5. Click **Deploy** and wait for the build to finish.
 
-   ```bash
-   python -m pip install -r requirements.txt
-   ```
+Streamlit Cloud runs `app.py`; the script embeds `index.html` as an interactive dashboard. Do not use the previous Flask `app.run(...)` line for Streamlit Cloud.
 
-4. Start the app:
+## Run locally
 
-   ```bash
-   python app.py
-   ```
+```bash
+python -m pip install -r requirements.txt
+streamlit run app.py
+```
 
-5. Open <http://127.0.0.1:5000> in your browser.
+## Data and safety
 
-The demo API endpoints are `/api/health` and `/api/departments`.
-
-## GitHub Pages note
-
-GitHub Pages serves static HTML/CSS/JavaScript only; it does **not** run Python or Flask. The existing `index.html` can still be published on GitHub Pages, but `app.py` must run on a Python-capable host to provide backend/API functionality.
-
-## Demo data and safety
-
-All names, counts, and metrics are fictional examples for demonstration. This is not a production clinical system. Do not use real patient data. A real deployment would require authentication, authorization, secure storage, audit logging, validation, and appropriate clinical/security review.
+All names, counts, pathways, and operational metrics are synthetic demo data. This project is not a real clinical information system. Do not upload real patient or other sensitive health information.
