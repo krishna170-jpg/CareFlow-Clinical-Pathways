@@ -858,6 +858,12 @@
           $("genericText").textContent = "This area is a preview.";
         }
 
+        if (sectionName !== "Dashboard" && sectionName !== "Profile" && sectionName !== "Settings") {
+          $("genericTitle").textContent = sectionName;
+          $("genericText").textContent = "This area is a preview. Connect approved, secured systems before operational use.";
+          genericPage.hidden = false;
+        }
+
         if (sectionName === "Profile") {
           const emailText = $("profileEmail").textContent || $("signedInEmail").textContent || "admin@careflow.demo";
           populateUserProfile(emailText);
@@ -895,12 +901,10 @@
 
       const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-      // Check if user is already logged in
       client.auth.getSession().then(({ data: { session } }) => {
         setSignedIn(session);
       });
 
-      // Listen for auth changes
       client.auth.onAuthStateChange((event, session) => {
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
           setSignedIn(session);
@@ -909,11 +913,9 @@
         }
       });
 
-      // Auth form switching
       $("toLogin").addEventListener("click", () => showAuthForm("login"));
       $("toSignup").addEventListener("click", () => showAuthForm("signup"));
 
-      // Sign up with email and password
       $("signupForm").addEventListener("submit", async (event) => {
         event.preventDefault();
         const email = $("signupEmail").value.trim();
@@ -926,8 +928,8 @@
 
         message("Creating your account...");
 
-        const { error } = await client.auth.signUp({ 
-          email, 
+        const { error } = await client.auth.signUp({
+          email,
           password,
           options: {
             data: {
@@ -945,7 +947,6 @@
         setTimeout(() => showAuthForm("login"), 1500);
       });
 
-      // Log in with email and password
       $("loginForm").addEventListener("submit", async (event) => {
         event.preventDefault();
         const email = $("loginEmail").value.trim();
@@ -958,9 +959,9 @@
 
         message("Logging in...");
 
-        const { data, error } = await client.auth.signInWithPassword({ 
-          email, 
-          password 
+        const { data, error } = await client.auth.signInWithPassword({
+          email,
+          password
         });
 
         if (error) {
@@ -972,7 +973,6 @@
         setSignedIn(data.session);
       });
 
-      // Logout
       $("logoutButton").addEventListener("click", async () => {
         await client.auth.signOut();
         setSignedIn(null);
@@ -983,33 +983,43 @@
         setSignedIn(null);
       });
 
-      // Profile button
       $("profileButton").addEventListener("click", () => {
         showDashboardSection("Profile");
       });
 
-      // Mobile menu
       $("mobileMenu").addEventListener("click", () => {
         sidebar.classList.toggle("open");
       });
 
-      // Navigation
       document.querySelectorAll(".nav").forEach((button) => {
         button.addEventListener("click", () => {
           const page = button.dataset.page;
           showDashboardSection(page);
-          sidebar.classList.remove("open");
+          if (window.innerWidth <= 600) {
+            sidebar.classList.remove("open");
+          }
         });
       });
 
-      // Profile form actions
       $("saveProfile").addEventListener("click", () => {
-        message("✅ Profile saved!", true);
-        setTimeout(() => message(""), 2000);
+        const name = $("fullName").value.trim() || "Clinical Admin";
+        const role = $("jobTitle").value.trim() || "CareFlow Administrator";
+        const department = $("departmentInput").value.trim() || "Operations";
+
+        $("profileName").textContent = name;
+        $("profileRole").textContent = role;
+        $("profileDepartment").textContent = department;
+        $("profileStatus").textContent = "Active";
+        $("profileAccess").textContent = "Full";
+        $("profileVerified").textContent = "Active";
+        $("signedInEmail").textContent = $("profileEmail").textContent || $("signedInEmail").textContent || "admin@careflow.demo";
+
+        message("Profile updated successfully.", true);
       });
 
       $("resetProfile").addEventListener("click", () => {
         resetProfileDefaults();
+        message("Profile reset to defaults.", true);
       });
     })();
   </script>
