@@ -546,7 +546,7 @@
 
       <form id="signupForm">
         <h1>Create your account</h1>
-        <p class="muted">Register with your email and password. We'll send you a six-digit verification code.</p>
+        <p class="muted">Register with your email and password to access CareFlow.</p>
         <div class="field">
           <label for="signupEmail">Email address</label>
           <input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com" />
@@ -555,33 +555,15 @@
           <label for="signupPassword">Password</label>
           <input id="signupPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters" />
         </div>
-        <button class="primary" type="submit">Sign up and send code</button>
+        <button class="primary" type="submit">Sign up</button>
         <div class="auth-links">
-          <button class="text-btn" type="button" id="toLogin">Already registered? Log in</button>
-        </div>
-      </form>
-
-      <form id="otpForm" hidden>
-        <h1>Verify your email</h1>
-        <p class="muted">Enter the six-digit code from your email. Check your spam folder if necessary.</p>
-        <div class="field">
-          <label for="otpEmail">Email address</label>
-          <input id="otpEmail" type="email" required autocomplete="email" />
-        </div>
-        <div class="field">
-          <label for="otpCode">Six-digit verification code</label>
-          <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required placeholder="123456" />
-        </div>
-        <button class="primary" type="submit">Verify email</button>
-        <div class="auth-links">
-          <button class="text-btn" type="button" id="resendOtp">Resend code</button>
-          <button class="text-btn" type="button" id="backSignup">Back to signup</button>
+          <button class="text-btn" type="button" id="toLogin">Already have an account? Log in</button>
         </div>
       </form>
 
       <form id="loginForm" hidden>
         <h1>Welcome back</h1>
-        <p class="muted">Log in using your verified email address and password.</p>
+        <p class="muted">Log in using your email address and password.</p>
         <div class="field">
           <label for="loginEmail">Email address</label>
           <input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com" />
@@ -593,7 +575,6 @@
         <button class="primary" type="submit">Log in</button>
         <div class="auth-links">
           <button class="text-btn" type="button" id="toSignup">Create an account</button>
-          <button class="text-btn" type="button" id="forgotPassword">Forgot password?</button>
         </div>
       </form>
 
@@ -720,7 +701,7 @@
 
         <section class="panel">
           <h2>Governance &amp; Access</h2>
-          <div class="info">This dashboard uses fictional demo data and is not connected to a hospital system. Do not enter real patient information. Supabase authentication alone does not secure external workflows; use approved clinical systems and governance controls before operational deployment.</div>
+          <div class="info">This dashboard uses fictional demo data and is not connected to a hospital system. Do not enter real patient information. Keep your password secure.</div>
         </section>
       </section>
 
@@ -739,7 +720,7 @@
             <div class="avatar">👤</div>
             <h3 id="profileName">Clinical Admin</h3>
             <div class="profile-row"><b>Email</b><br /><span id="profileEmail"></span></div>
-            <div class="profile-row"><b>Email verification</b><br /><span id="profileVerified"></span></div>
+            <div class="profile-row"><b>Status</b><br /><span id="profileVerified">Active</span></div>
             <div class="profile-row"><b>User ID</b><br /><span id="profileUserId"></span></div>
             <div class="profile-row"><b>Role</b><br /><span id="profileRole">CareFlow Administrator</span></div>
             <button class="small-btn" type="button" id="profileLogout" style="margin-top: 10px;">Log out</button>
@@ -810,7 +791,6 @@
       const pageTitle = $("pageTitle");
       const pageSubtitle = $("pageSubtitle");
       const sidebar = $("sidebar");
-      let pendingEmail = "";
 
       const pageMeta = {
         Dashboard: { title: "Dashboard", subtitle: "Hospital operations at a glance · Demo data" },
@@ -860,7 +840,6 @@
 
       function showAuthForm(which) {
         $("signupForm").hidden = which !== "signup";
-        $("otpForm").hidden = which !== "otp";
         $("loginForm").hidden = which !== "login";
         message("");
       }
@@ -892,16 +871,15 @@
 
       function setSignedIn(session) {
         const user = session && session.user;
-        const verified = !!(user && user.email_confirmed_at);
+        const isAuthenticated = !!user;
 
-        dashboard.hidden = !verified;
-        authScreen.hidden = verified;
+        dashboard.hidden = !isAuthenticated;
+        authScreen.hidden = isAuthenticated;
 
-        if (verified) {
+        if (isAuthenticated) {
           const email = user.email || "admin@careflow.demo";
           $("signedInEmail").textContent = email;
           $("profileEmail").textContent = email;
-          $("profileVerified").textContent = "Verified";
           $("profileUserId").textContent = user.id || "demo-user-id";
           populateUserProfile(email);
           showDashboardSection("Dashboard");
@@ -917,14 +895,25 @@
 
       const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-      $("toLogin").addEventListener("click", () => showAuthForm("login"));
-      $("toSignup").addEventListener("click", () => showAuthForm("signup"));
-      $("backSignup").addEventListener("click", () => showAuthForm("signup"));
-
-      $("forgotPassword").addEventListener("click", () => {
-        message("Password reset is not configured in this demo app. Use the signup flow to create a new account.");
+      // Check if user is already logged in
+      client.auth.getSession().then(({ data: { session } }) => {
+        setSignedIn(session);
       });
 
+      // Listen for auth changes
+      client.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          setSignedIn(session);
+        } else if (event === "SIGNED_OUT") {
+          setSignedIn(null);
+        }
+      });
+
+      // Auth form switching
+      $("toLogin").addEventListener("click", () => showAuthForm("login"));
+      $("toSignup").addEventListener("click", () => showAuthForm("signup"));
+
+      // Sign up with email and password
       $("signupForm").addEventListener("submit", async (event) => {
         event.preventDefault();
         const email = $("signupEmail").value.trim();
@@ -935,174 +924,92 @@
           return;
         }
 
-        pendingEmail = email;
-        message("Creating your account and requesting a verification code…");
+        message("Creating your account...");
 
-        const { error } = await client.auth.signUp({ email, password });
-
-        if (error) {
-          message(error.message);
-          return;
-        }
-
-        $("otpEmail").value = email;
-        showAuthForm("otp");
-        message("Check your inbox and spam folder for the six-digit signup code.", true);
-      });
-
-      $("otpForm").addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const email = $("otpEmail").value.trim();
-        const token = $("otpCode").value.trim();
-
-        if (!/^[0-9]{6}$/.test(token)) {
-          message("Enter the six-digit code from your email.");
-          return;
-        }
-
-        message("Verifying your email…");
-
-        const { data, error } = await client.auth.verifyOtp({
-          email,
-          token,
-          type: "signup"
+        const { error } = await client.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            data: {
+              name: "Clinical Admin"
+            }
+          }
         });
 
         if (error) {
-          message(error.message);
+          message(`Error: ${error.message}`);
           return;
         }
 
-        pendingEmail = email;
-
-        if (data.session && data.user && data.user.email_confirmed_at) {
-          setSignedIn(data.session);
-          return;
-        }
-
-        $("loginEmail").value = email;
-        showAuthForm("login");
-        message("Email verified. Log in using your password.", true);
+        message("✅ Account created! Please log in.", true);
+        setTimeout(() => showAuthForm("login"), 1500);
       });
 
-      $("resendOtp").addEventListener("click", async () => {
-        const email = $("otpEmail").value.trim() || pendingEmail;
-        if (!email) {
-          message("Enter your email address first.");
-          return;
-        }
-
-        message("Requesting another code…");
-        const { error } = await client.auth.resend({ type: "signup", email });
-
-        message(
-          error ? error.message : "If the account is eligible, a new code was sent. Check your inbox and spam folder.",
-          !error
-        );
-      });
-
+      // Log in with email and password
       $("loginForm").addEventListener("submit", async (event) => {
         event.preventDefault();
-        message("Signing in…");
+        const email = $("loginEmail").value.trim();
+        const password = $("loginPassword").value;
 
-        const { data, error } = await client.auth.signInWithPassword({
-          email: $("loginEmail").value.trim(),
-          password: $("loginPassword").value
+        if (!email || !password) {
+          message("Email and password are required.");
+          return;
+        }
+
+        message("Logging in...");
+
+        const { data, error } = await client.auth.signInWithPassword({ 
+          email, 
+          password 
         });
 
         if (error) {
-          message(error.message);
+          message(`Error: ${error.message}`);
           return;
         }
 
-        if (!data.user || !data.user.email_confirmed_at) {
-          await client.auth.signOut();
-          $("otpEmail").value = $("loginEmail").value.trim();
-          showAuthForm("otp");
-          message("Your email needs verification. Enter the signup verification code.");
-          return;
-        }
-
+        message("✅ Logged in successfully!", true);
         setSignedIn(data.session);
       });
 
+      // Logout
       $("logoutButton").addEventListener("click", async () => {
         await client.auth.signOut();
-        showAuthForm("login");
-        message("Signed out.");
+        setSignedIn(null);
       });
 
       $("profileLogout").addEventListener("click", async () => {
         await client.auth.signOut();
-        showAuthForm("login");
-        message("Signed out.");
+        setSignedIn(null);
       });
 
-      $("profileButton").addEventListener("click", () => showDashboardSection("Profile"));
-      $("mobileMenu").addEventListener("click", () => sidebar.classList.toggle("open"));
+      // Profile button
+      $("profileButton").addEventListener("click", () => {
+        showDashboardSection("Profile");
+      });
 
+      // Mobile menu
+      $("mobileMenu").addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+      });
+
+      // Navigation
+      document.querySelectorAll(".nav").forEach((button) => {
+        button.addEventListener("click", () => {
+          const page = button.dataset.page;
+          showDashboardSection(page);
+          sidebar.classList.remove("open");
+        });
+      });
+
+      // Profile form actions
       $("saveProfile").addEventListener("click", () => {
-        populateUserProfile($("profileEmail").textContent || $("signedInEmail").textContent || "admin@careflow.demo");
-        message("Profile updated successfully.", true);
+        message("✅ Profile saved!", true);
+        setTimeout(() => message(""), 2000);
       });
 
       $("resetProfile").addEventListener("click", () => {
         resetProfileDefaults();
-        message("Profile reset to default values.");
-      });
-
-      document.querySelectorAll(".nav").forEach((button) => {
-        button.addEventListener("click", () => {
-          const page = button.dataset.page;
-          if (page === "Profile") {
-            showDashboardSection("Profile");
-            return;
-          }
-          if (page === "Settings") {
-            showDashboardSection("Settings");
-            return;
-          }
-          if (page === "Dashboard") {
-            showDashboardSection("Dashboard");
-            return;
-          }
-          $("genericTitle").textContent = page;
-          $("genericText").textContent = "This section is a demo preview for " + page + ".";
-          genericPage.hidden = false;
-          dashboardPage.hidden = true;
-          profilePage.hidden = true;
-          pageTitle.textContent = page;
-          pageSubtitle.textContent = pageMeta[page]?.subtitle || "Preview section";
-          document.querySelectorAll(".nav").forEach((navButton) => {
-            navButton.classList.toggle("active", navButton.dataset.page === page);
-          });
-        });
-      });
-
-      client.auth.getSession().then(({ data, error }) => {
-        if (error) {
-          message(error.message);
-          showAuthForm("login");
-          return;
-        }
-
-        if (data.session && data.session.user && data.session.user.email_confirmed_at) {
-          setSignedIn(data.session);
-        } else {
-          showAuthForm("login");
-        }
-      });
-
-      client.auth.onAuthStateChange((event, session) => {
-        if (event === "SIGNED_IN" && session?.user) {
-          setSignedIn(session);
-        }
-
-        if (event === "SIGNED_OUT") {
-          dashboard.hidden = true;
-          authScreen.hidden = false;
-          showAuthForm("login");
-        }
       });
     })();
   </script>
