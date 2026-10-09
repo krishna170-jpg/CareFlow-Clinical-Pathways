@@ -17,6 +17,7 @@
       --danger: #ff7d7d;
       --success: #73e4bd;
       --shadow: rgba(0, 0, 0, 0.35);
+      --card: #1d2c4d;
     }
 
     * { box-sizing: border-box; }
@@ -29,21 +30,10 @@
       color: var(--text);
     }
 
-    body {
-      min-height: 100vh;
-    }
-
-    button, input {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
+    body { min-height: 100vh; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
 
     .auth-screen {
       position: fixed;
@@ -72,9 +62,7 @@
       letter-spacing: -0.04em;
     }
 
-    .brand span {
-      color: var(--cyan);
-    }
+    .brand span { color: var(--cyan); }
 
     .auth-card h1 {
       font-size: 23px;
@@ -108,9 +96,7 @@
       outline: none;
     }
 
-    .field input:focus {
-      border-color: #50a0ff;
-    }
+    .field input:focus { border-color: #50a0ff; }
 
     .primary {
       width: 100%;
@@ -123,9 +109,7 @@
       margin-top: 17px;
     }
 
-    .primary:disabled {
-      opacity: .6;
-    }
+    .primary:disabled { opacity: .6; }
 
     .text-btn {
       background: none;
@@ -143,9 +127,7 @@
       margin-top: 14px;
     }
 
-    .status.success {
-      color: var(--success);
-    }
+    .status.success { color: var(--success); }
 
     .auth-links {
       display: flex;
@@ -177,9 +159,7 @@
       font-weight: 800;
     }
 
-    .side-brand span {
-      color: var(--cyan);
-    }
+    .side-brand span { color: var(--cyan); }
 
     .nav-label {
       font-size: 10px;
@@ -201,8 +181,7 @@
       transition: 0.15s ease;
     }
 
-    .nav:hover,
-    .nav.active {
+    .nav:hover, .nav.active {
       background: #243b71;
       color: white;
     }
@@ -260,9 +239,7 @@
       border-radius: 8px;
     }
 
-    .small-btn:hover {
-      background: #304778;
-    }
+    .small-btn:hover { background: #304778; }
 
     .grid {
       display: grid;
@@ -415,24 +392,35 @@
       margin-top: 15px;
     }
 
+    .profile-shell {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 320px minmax(0, 1fr);
+      margin-top: 18px;
+    }
+
     .profile-card {
-      background: #1a2b51;
+      background: linear-gradient(180deg, #1a2b51, #172642);
       border: 1px solid #30446f;
       border-radius: 13px;
       padding: 22px;
-      margin-top: 15px;
     }
 
     .avatar {
-      width: 58px;
-      height: 58px;
+      width: 68px;
+      height: 68px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      background: #246bca;
-      font-size: 24px;
+      background: linear-gradient(135deg, #246bca, #27d6cb);
+      font-size: 26px;
       font-weight: 800;
-      margin-bottom: 13px;
+      margin-bottom: 16px;
+    }
+
+    .profile-card h3 {
+      margin: 0 0 6px;
+      font-size: 22px;
     }
 
     .profile-row {
@@ -442,6 +430,83 @@
       overflow-wrap: anywhere;
     }
 
+    .profile-row:last-child {
+      border-bottom: none;
+    }
+
+    .profile-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mini-stat {
+      background: #162746;
+      border: 1px solid #32476d;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .mini-stat .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .mini-stat .value {
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .profile-form {
+      background: #152540;
+      border: 1px solid #30446f;
+      border-radius: 13px;
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .input-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .input-wrap label {
+      color: #d7e3ff;
+      font-size: 12px;
+    }
+
+    .input-wrap input {
+      background: #0d1731;
+      color: white;
+      border: 1px solid #475d8d;
+      border-radius: 8px;
+      padding: 11px 12px;
+    }
+
+    .profile-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ghost-btn {
+      background: transparent;
+      border: 1px solid #4c6291;
+      color: white;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
     footer {
       text-align: center;
       color: #8497c7;
@@ -449,49 +514,27 @@
       padding: 22px 0;
     }
 
-    .mobile-menu {
-      display: none;
-    }
+    .mobile-menu { display: none; }
 
     @media (max-width: 850px) {
-      .app {
-        grid-template-columns: 190px minmax(0, 1fr);
-      }
-
+      .app { grid-template-columns: 190px minmax(0, 1fr); }
       .main { padding: 15px; }
       .grid { gap: 8px; }
       .metric { padding: 13px; }
       .lower { grid-template-columns: 1fr; }
+      .profile-shell { grid-template-columns: 1fr; }
+      .profile-summary { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
-      .app {
-        display: block;
-      }
-
-      .sidebar {
-        display: none;
-      }
-
-      .sidebar.open {
-        display: flex;
-      }
-
-      .mobile-menu {
-        display: inline-block;
-      }
-
-      .main {
-        padding: 13px 10px;
-      }
-
-      .page-title {
-        font-size: 21px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .app { display: block; }
+      .sidebar { display: none; }
+      .sidebar.open { display: flex; }
+      .mobile-menu { display: inline-block; }
+      .main { padding: 13px 10px; }
+      .page-title { font-size: 21px; }
+      .grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -689,13 +732,59 @@
 
       <section class="panel" id="profilePage" hidden>
         <h2>My Profile</h2>
-        <p class="muted">Your Supabase account details.</p>
-        <div class="profile-card">
-          <div class="avatar">👤</div>
-          <div class="profile-row"><b>Email</b><br /><span id="profileEmail"></span></div>
-          <div class="profile-row"><b>Email verification</b><br /><span id="profileVerified"></span></div>
-          <div class="profile-row"><b>User ID</b><br /><span id="profileUserId"></span></div>
-          <button class="small-btn" type="button" id="profileLogout">Log out</button>
+        <p class="muted">Your CareFlow account and access details.</p>
+
+        <div class="profile-shell">
+          <div class="profile-card">
+            <div class="avatar">👤</div>
+            <h3 id="profileName">Clinical Admin</h3>
+            <div class="profile-row"><b>Email</b><br /><span id="profileEmail"></span></div>
+            <div class="profile-row"><b>Email verification</b><br /><span id="profileVerified"></span></div>
+            <div class="profile-row"><b>User ID</b><br /><span id="profileUserId"></span></div>
+            <div class="profile-row"><b>Role</b><br /><span id="profileRole">CareFlow Administrator</span></div>
+            <button class="small-btn" type="button" id="profileLogout" style="margin-top: 10px;">Log out</button>
+          </div>
+
+          <div class="profile-form">
+            <div class="profile-summary">
+              <div class="mini-stat">
+                <div class="label">Access</div>
+                <div class="value" id="profileAccess">Full</div>
+              </div>
+              <div class="mini-stat">
+                <div class="label">Department</div>
+                <div class="value" id="profileDepartment">Operations</div>
+              </div>
+              <div class="mini-stat">
+                <div class="label">Status</div>
+                <div class="value" id="profileStatus">Active</div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="input-wrap">
+                <label for="fullName">Full name</label>
+                <input id="fullName" type="text" value="Clinical Admin" />
+              </div>
+              <div class="input-wrap">
+                <label for="jobTitle">Role / title</label>
+                <input id="jobTitle" type="text" value="CareFlow Administrator" />
+              </div>
+              <div class="input-wrap">
+                <label for="departmentInput">Department</label>
+                <input id="departmentInput" type="text" value="Operations" />
+              </div>
+              <div class="input-wrap">
+                <label for="phoneInput">Phone</label>
+                <input id="phoneInput" type="tel" value="+91 98765 43210" />
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button class="small-btn" type="button" id="saveProfile">Save profile</button>
+              <button class="ghost-btn" type="button" id="resetProfile">Reset</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -736,6 +825,34 @@
         Settings: { title: "Settings", subtitle: "Workspace configuration and access" }
       };
 
+      function populateUserProfile(userEmail) {
+        const name = $("fullName").value || "Clinical Admin";
+        const role = $("jobTitle").value || "CareFlow Administrator";
+        const department = $("departmentInput").value || "Operations";
+        const phone = $("phoneInput").value || "+91 98765 43210";
+
+        $("profileName").textContent = name;
+        $("profileRole").textContent = role;
+        $("profileDepartment").textContent = department;
+        $("profileAccess").textContent = "Full";
+        $("profileStatus").textContent = "Active";
+        $("profileEmail").textContent = userEmail || "No email";
+        $("signedInEmail").textContent = userEmail || "";
+
+        $("fullName").value = name;
+        $("jobTitle").value = role;
+        $("departmentInput").value = department;
+        $("phoneInput").value = phone;
+      }
+
+      function resetProfileDefaults() {
+        $("fullName").value = "Clinical Admin";
+        $("jobTitle").value = "CareFlow Administrator";
+        $("departmentInput").value = "Operations";
+        $("phoneInput").value = "+91 98765 43210";
+        populateUserProfile($("profileEmail").textContent || $("signedInEmail").textContent || "admin@careflow.demo");
+      }
+
       function message(text, success = false) {
         authStatus.textContent = text;
         authStatus.classList.toggle("success", success);
@@ -762,12 +879,9 @@
           $("genericText").textContent = "This area is a preview.";
         }
 
-        if (sectionName === "Settings" || sectionName === "Profile") {
-          genericPage.hidden = true;
-        }
-
         if (sectionName === "Profile") {
-          profilePage.hidden = false;
+          const emailText = $("profileEmail").textContent || $("signedInEmail").textContent || "admin@careflow.demo";
+          populateUserProfile(emailText);
         }
 
         document.querySelectorAll(".nav").forEach((button) => {
@@ -784,10 +898,12 @@
         authScreen.hidden = verified;
 
         if (verified) {
-          $("signedInEmail").textContent = user.email || "";
-          $("profileEmail").textContent = user.email || "";
+          const email = user.email || "admin@careflow.demo";
+          $("signedInEmail").textContent = email;
+          $("profileEmail").textContent = email;
           $("profileVerified").textContent = "Verified";
-          $("profileUserId").textContent = user.id || "";
+          $("profileUserId").textContent = user.id || "demo-user-id";
+          populateUserProfile(email);
           showDashboardSection("Dashboard");
         } else {
           showAuthForm("login");
@@ -877,10 +993,7 @@
         }
 
         message("Requesting another code…");
-        const { error } = await client.auth.resend({
-          type: "signup",
-          email
-        });
+        const { error } = await client.auth.resend({ type: "signup", email });
 
         message(
           error ? error.message : "If the account is eligible, a new code was sent. Check your inbox and spam folder.",
@@ -927,6 +1040,16 @@
 
       $("profileButton").addEventListener("click", () => showDashboardSection("Profile"));
       $("mobileMenu").addEventListener("click", () => sidebar.classList.toggle("open"));
+
+      $("saveProfile").addEventListener("click", () => {
+        populateUserProfile($("profileEmail").textContent || $("signedInEmail").textContent || "admin@careflow.demo");
+        message("Profile updated successfully.", true);
+      });
+
+      $("resetProfile").addEventListener("click", () => {
+        resetProfileDefaults();
+        message("Profile reset to default values.");
+      });
 
       document.querySelectorAll(".nav").forEach((button) => {
         button.addEventListener("click", () => {
