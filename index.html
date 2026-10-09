@@ -214,51 +214,7 @@ renderDepts();renderPaths();renderTasks();renderTeams();renderChart();renderRepo
     }
   });
 })();
-  
-  // CareFlow Profile and Logout
-  const cfControls = document.createElement("div");
-  cfControls.id = "cf-user-controls";
-  cfControls.style.cssText =
-    "position:fixed;top:12px;right:12px;z-index:99998;display:none;gap:8px";
-
-  cfControls.innerHTML =
-    '<button id="cf-profile-action" type="button">👤 Profile</button>' +
-    '<button id="cf-logout-action" type="button">↪ Logout</button>';
-
-  document.body.appendChild(cfControls);
-
-  $("cf-profile-action").onclick = async () => {
-    const { data, error } = await client.auth.getUser();
-    if (error || !data.user) {
-      alert("Please log in again.");
-      return;
-    }
-    alert("CareFlow Profile\nEmail: " + data.user.email +
-      "\nVerified: " +
-      (data.user.email_confirmed_at ? "Yes" : "No"));
-  };
-
-  $("cf-logout-action").onclick = async () => {
-    if (!confirm("Are you sure you want to log out?")) return;
-    const { error } = await client.auth.signOut();
-    if (error) {
-      alert("Logout failed: " + error.message);
-      return;
-    }
-    cfControls.style.display = "none";
-    $("cf-auth").style.display = "flex";
-    $("cf-signup-form").style.display = "none";
-    $("cf-otp-form").style.display = "none";
-    $("cf-login-form").style.display = "block";
-    $("cf-title").textContent = "Log in to CareFlow";
-    $("cf-status").textContent = "You have logged out.";
-  };
-
-  client.auth.onAuthStateChange((_event, session) => {
-    cfControls.style.display =
-      session && session.user.email_confirmed_at ? "flex" : "none";
-  });
-  
+    
 </script>
 </body>
 </html>
