@@ -104,3 +104,116 @@ renderDepts();renderPaths();renderTasks();renderTeams();renderChart();renderRepo
 </script>
 
 </body></html>
+<!-- CareFlow Signup -->
+<div id="cf-auth" style="position:fixed;inset:0;z-index:99999;background:#101827;color:white;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;padding:20px">
+  <div style="width:100%;max-width:380px;background:#1b2638;padding:26px;border-radius:16px">
+    <h2 id="cf-title">Create your CareFlow account</h2>
+    <p id="cf-message">Sign up with your email and password.</p>
+    <form id="cf-signup-form">
+      <input id="cf-email" type="email" placeholder="Email address" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0">
+      <input id="cf-password" type="password" placeholder="Password (minimum 6 characters)" minlength="6" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0">
+      <button type="submit" style="width:100%;padding:12px;margin-top:12px">Sign up and send OTP</button>
+    </form>
+    <form id="cf-otp-form" style="display:none">
+      <input id="cf-otp" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="6-digit email code" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0">
+      <button type="submit" style="width:100%;padding:12px">Verify email</button>
+    </form>
+    <form id="cf-login-form" style="display:none">
+      <input id="cf-login-email" type="email" placeholder="Email address" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0">
+      <input id="cf-login-password" type="password" placeholder="Password" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0">
+      <button type="submit" style="width:100%;padding:12px">Log in</button>
+    </form>
+    <p><button type="button" id="cf-show-login">Already registered? Log in</button></p>
+    <p><button type="button" id="cf-show-signup">Create an account</button></p>
+    <p id="cf-status" role="status"></p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function () {
+  const SUPABASE_URL = "https://ulvufamwnohkqhneohti.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_yjBxfch-2FYYVgmslqs2qg_RFcLSday";
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const $ = id => document.getElementById(id);
+  const status = message => $("cf-status").textContent = message;
+  const signupForm = $("cf-signup-form");
+  const otpForm = $("cf-otp-form");
+  const loginForm = $("cf-login-form");
+
+  $("cf-show-login").onclick = () => {
+    signupForm.style.display = "none";
+    otpForm.style.display = "none";
+    loginForm.style.display = "block";
+    $("cf-title").textContent = "Log in to CareFlow";
+    status("");
+  };
+  $("cf-show-signup").onclick = () => {
+    signupForm.style.display = "block";
+    otpForm.style.display = "none";
+    loginForm.style.display = "none";
+    $("cf-title").textContent = "Create your CareFlow account";
+    status("");
+  };
+
+  signupForm.onsubmit = async event => {
+    event.preventDefault();
+    const email = $("cf-email").value.trim();
+    const password = $("cf-password").value;
+    status("Sending verification email...");
+    const { error } = await client.auth.signUp({
+      email, password,
+      options: { emailRedirectTo: location.origin + location.pathname }
+    });
+    if (error) return status(error.message);
+    signupForm.style.display = "none";
+    loginForm.style.display = "none";
+    otpForm.style.display = "block";
+    $("cf-title").textContent = "Verify your email";
+    status("Enter the 6-digit code sent to " + email);
+  };
+
+  otpForm.onsubmit = async event => {
+    event.preventDefault();
+    const email = $("cf-email").value.trim();
+    const token = $("cf-otp").value.trim();
+    status("Verifying code...");
+    const { error } = await client.auth.verifyOtp({
+      email, token, type: "signup"
+    });
+    if (error) return status(error.message);
+    $("cf-auth").style.display = "none";
+    alert("Email verified! Please log in to continue.");
+    loginForm.style.display = "block";
+    $("cf-auth").style.display = "flex";
+    signupForm.style.display = "none";
+    otpForm.style.display = "none";
+    $("cf-title").textContent = "Log in to CareFlow";
+    $("cf-login-email").value = email;
+    status("Email verified. Log in to continue.");
+  };
+
+  loginForm.onsubmit = async event => {
+    event.preventDefault();
+    status("Logging in...");
+    const { data, error } = await client.auth.signInWithPassword({
+      email: $("cf-login-email").value.trim(),
+      password: $("cf-login-password").value
+    });
+    if (error) return status(error.message);
+    if (!data.user.email_confirmed_at) {
+      await client.auth.signOut();
+      return status("Please verify your email before logging in.");
+    }
+    $("cf-auth").style.display = "none";
+    status("Logged in.");
+  };
+
+  client.auth.getSession().then(({ data }) => {
+    if (data.session && data.session.user.email_confirmed_at) {
+      $("cf-auth").style.display = "none";
+    }
+  });
+})();
+</script>
+</body>
+</html>
